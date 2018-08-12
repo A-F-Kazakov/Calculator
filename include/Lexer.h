@@ -1,45 +1,102 @@
-//
-// Created by k on 28.07.17.
-//
+/**
+ * @author   Казаков Андрей
+ * @date     28.08.17.
+ */
 
 #ifndef CALCULATOR_LEXER_H
 #define CALCULATOR_LEXER_H
 
-#include <iostream>
-#include <string>
 #include <sstream>
-#include <vector>
+#include <string_view>
+#include <ostream>
 
-#include <Token.h>
+#include "Token.h"
 
+template<template<typename, typename> typename Container>
 class Lexer
 {
 	public:
-		Lexer(const std::string&);
+		typedef Container<Token, std::allocator<Token>> dataType;
 
-		void tokenize();
+		Lexer() = default;
 
-		const std::vector<Token>& getTokens() const;
+		void tokenize(std::string_view str)
+		{
+			size_t currentPosition = 0;
+			char c = 0;
+			while(currentPosition < str.size())
+			{
+				c = str.at(currentPosition);
+				if(c == ' ')
+				{
+					++currentPosition;
+					continue;
+				}
 
-		friend std::ostream& operator<<(std::ostream&, const Lexer&);
+				if(c >= '0' && c <= '9')
+					currentPosition = tokenizeNumber(str, currentPosition);
+				else
+				{
+					tokenizeOperator(c);
+					++currentPosition;
+				}
+			}
+		}
+
+		const dataType& getTokens() const { return this->tokens; };
+
+		friend std::ostream& operator<<(std::ostream& os, const Lexer& lexer)
+		{
+			for(auto&& item : lexer.tokens)
+				os << item << '\n';
+			return os;
+		}
 
 	private:
-		std::string input;
-		std::vector<Token> tokens;
-		size_t currentPosition, lenght;
+		dataType tokens;
 
-		static std::string OPERATOR_CHARS;
-		static TokenType OPERATOR_TYPES[];
+		size_t tokenizeNumber(std::string_view str, size_t pos)
+		{
+			std::stringstream ss;
 
-		char peek(size_t = 0);
-		char next();
+			Token::Type t = Token::Type::NUMBER;
+			char c = 0;
 
-		void tokenizeNumber();
-		void tokenizeOperator(size_t);
+			do
+			{
+				c = str.at(pos);
 
-		void tokenizeHex();
+				if((c == 'x' || c == 'X') && ss.peek() == '0')
+					t = Token::Type::HEX_NUMBER;
 
-		void tokenizeBin();
+				if((c == 'b' || c == 'B') && ss.peek() == '0')
+					t = Token::Type::BIN_NUMBER;
+
+				if(c == ',')
+					c = '.';
+
+				if(!check(c))
+					break;
+				ss << c;
+				++pos;
+			}
+			while(pos < str.length());
+
+			tokens.emplace_back(t, ss.str());
+			return pos;
+		}
+
+		void tokenizeOperator(size_t op) { tokens.emplace_back(static_cast<Token::Type>(op)); }
+
+		inline bool check(char c)
+		{
+			return (c >= '0' && c <= '9') ||
+					 (c == '.' || c == ',') ||
+					 (c == 'x' || c == 'X') ||
+					 (c == 'b' || c == 'B') ||
+					 (c >= 'A' && c <= 'F') ||
+					 (c >= 'a' && c <= 'f');
+		}
 };
 
 #endif //CALCULATOR_LEXER_H

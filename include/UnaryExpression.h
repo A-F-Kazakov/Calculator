@@ -1,24 +1,25 @@
 /**
- * author   k 
- * date     06.08.17.
- */
+* @author   Казаков Андрей
+* @date     06.08.17.
+*/
 
 #ifndef CALCULATOR_UNARYEXPRESSION_H
 #define CALCULATOR_UNARYEXPRESSION_H
 
-#include <ostream>
-#include <iostream>
-#include <Expression.h>
+//#include <ostream>
+//#include <iostream>
+#include "Expression.h"
 
 class UnaryExpression : public Expression
 {
 	public:
 		UnaryExpression(char, Expression*);
 
-		virtual ~UnaryExpression();
+		~UnaryExpression() override;
 
-		float eval();
-		void print(std::ostream& os) const;
+		float eval() override;
+
+		void print(std::ostream& os) const override;
 
 	private:
 		char operation;

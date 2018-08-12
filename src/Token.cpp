@@ -1,42 +1,28 @@
-//
-// Created by k on 28.07.17.
-//
+#include "Token.h"
 
-#include <Token.h>
-
-std::ostream& operator<<(std::ostream& os, const TokenType& type)
+std::ostream& operator<<(std::ostream& os, Token::Type type)
 {
 	switch(type)
 	{
-		case TokenType::NUMBER:
-			os << "NUMBER";
+		case Token::Type::NUMBER: os << "NUMBER";
 			break;
-		case TokenType::DIVISION:
-			os << "DIVISION";
+		case Token::Type::DIVISION: os << "DIVISION";
 			break;
-		case TokenType::PLUS:
-			os << "PLUS";
+		case Token::Type::PLUS: os << "PLUS";
 			break;
-		case TokenType::MINUS:
-			os << "MINUS";
+		case Token::Type::MINUS: os << "MINUS";
 			break;
-		case TokenType::MULTIPLY:
-			os << "MULTIPLY";
+		case Token::Type::MULTIPLY: os << "MULTIPLY";
 			break;
-		case TokenType::HEX_NUMBER:
-			os << "HEX";
+		case Token::Type::HEX_NUMBER: os << "HEX";
 			break;
-		case TokenType::BIN_NUMBER:
-			os << "BIN";
+		case Token::Type::BIN_NUMBER: os << "BIN";
 			break;
-		case TokenType::L_BRACKET:
-			os << "LEFT_BRACKET";
+		case Token::Type::L_BRACKET: os << "LEFT_BRACKET";
 			break;
-		case TokenType::R_BRACKET:
-			os << "RIGHT_BRACKET";
+		case Token::Type::R_BRACKET: os << "RIGHT_BRACKET";
 			break;
-		default:
-			os << "unknown";
+		default: os << "unknown";
 	}
 	return os;
 }
@@ -47,28 +33,10 @@ std::ostream& operator<<(std::ostream& os, const Token& token)
 	return os;
 }
 
-Token::Token(){}
+Token::Token() : data(), type(Token::Type::NONE) {}
 
-Token::Token(TokenType type) : type(type){}
+Token::Token(Token::Type type) : type(type) {}
 
-Token::Token(TokenType type, const std::string& data) : type(type), data(data){}
+Token::Token(Token::Type type, const std::string& data) : type(type), data(data) {}
 
-const std::string& Token::getData() const
-{
-	return data;
-}
-
-void Token::setData(const std::string& data)
-{
-	Token::data = data;
-}
-
-TokenType Token::getType() const
-{
-	return type;
-}
-
-void Token::setType(TokenType type)
-{
-	Token::type = type;
-}
+Token::Token(Token::Type type, std::string&& data) : type(type), data(std::move(data)) {}
