@@ -3,7 +3,7 @@
 BinaryExpression::BinaryExpression(char operation, Expression* expr1, Expression* expr2) :
 		operation(operation), expr1(expr1), expr2(expr2) {}
 
-float BinaryExpression::eval()
+float BinaryExpression::eval() const
 {
 	switch(operation)
 	{
@@ -23,5 +23,5 @@ BinaryExpression::~BinaryExpression()
 
 void BinaryExpression::print(std::ostream& os) const
 {
-	os << *expr1 << " " << operation << " " << *expr2;
+	os << '(' << *expr1 << " " << operation << " " << *expr2 << ')';
 }

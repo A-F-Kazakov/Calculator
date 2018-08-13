@@ -13,7 +13,7 @@ class NumberExpression : public Expression
 	public:
 		explicit NumberExpression(float);
 
-		float eval() override;
+		float eval() const override;
 
 		void print(std::ostream& os) const override;
 

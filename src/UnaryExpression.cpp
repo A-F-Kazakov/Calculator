@@ -2,7 +2,7 @@
 
 UnaryExpression::UnaryExpression(char operation, Expression* data) : operation(operation), data(data) {}
 
-float UnaryExpression::eval() { return -(data->eval()); }
+float UnaryExpression::eval() const { return -(data->eval()); }
 
 UnaryExpression::~UnaryExpression() { delete data; }
 

@@ -15,7 +15,7 @@ class BinaryExpression : public Expression
 
 		~BinaryExpression() override;
 
-		float eval() override;
+		float eval() const override;
 
 		void print(std::ostream& os) const override;
 

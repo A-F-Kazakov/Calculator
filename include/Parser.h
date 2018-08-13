@@ -1,19 +1,16 @@
 /**
- * author   k 
- * date     06.08.17.
+ * @author   Казаков Андрей
+ * @date     06.08.17.
  */
 
 #ifndef CALCULATOR_PARSER_H
 #define CALCULATOR_PARSER_H
 
-//#include <iostream>
-//#include <sstream>
-//#include <vector>
-//#include <exception>
-
 #include "Token.h"
 #include "Expression.h"
 #include "NumberExpression.h"
+#include "HexNumberExpression.h"
+#include "BinNumberExpression.h"
 #include "BinaryExpression.h"
 #include "UnaryExpression.h"
 #include "Lexer.h"
@@ -35,13 +32,13 @@ class Parser
 			result.clear();
 		}
 
-		dataType parse()
+		void parse()
 		{
 			while(!match(Token::Type::NONE))
 				result.emplace_back(expression());
-
-			return result;
 		}
+
+		dataType getExpression() const { return result; }
 
 		friend std::ostream& operator<<(std::ostream& os, const Parser& parser)
 		{
@@ -113,16 +110,16 @@ class Parser
 			const Token& current = get();
 
 			if(match(Token::Type::NUMBER))
-				return new NumberExpression(atof(current.getData().c_str()));
+				return new NumberExpression(static_cast<float>(atof(current.getData().c_str())));
 
 			if(match(Token::Type::HEX_NUMBER))
-				return new NumberExpression(std::stoul(current.getData(), nullptr, 16));
+				return new HexNumberExpression(std::stoul(current.getData(), nullptr, 16));
 
 			if(match(Token::Type::BIN_NUMBER))
 			{
 				std::string tmp = current.getData();
 				tmp.erase(0,2);
-				return new NumberExpression(std::stoi(tmp, nullptr, 2));
+				return new BinNumberExpression(std::stoi(tmp, nullptr, 2));
 			}
 
 			if(match(Token::Type::L_BRACKET))

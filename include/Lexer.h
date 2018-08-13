@@ -66,10 +66,10 @@ class Lexer
 			{
 				c = str.at(pos);
 
-				if((c == 'x' || c == 'X') && ss.peek() == '0')
+				if((c == 'x' || c == 'X') && ss.peek() == '0' && t != Token::Type::BIN_NUMBER)
 					t = Token::Type::HEX_NUMBER;
 
-				if((c == 'b' || c == 'B') && ss.peek() == '0')
+				if((c == 'b' || c == 'B') && ss.peek() == '0' && t != Token::Type::HEX_NUMBER)
 					t = Token::Type::BIN_NUMBER;
 
 				if(c == ',')

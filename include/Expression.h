@@ -13,7 +13,7 @@ class Expression
 	public:
 		virtual ~Expression() = default;
 
-		virtual float eval() = 0;
+		virtual float eval() const = 0;
 
 		virtual void print(std::ostream& os) const = 0;
 

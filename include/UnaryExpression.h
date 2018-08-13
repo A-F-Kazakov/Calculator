@@ -17,7 +17,7 @@ class UnaryExpression : public Expression
 
 		~UnaryExpression() override;
 
-		float eval() override;
+		float eval() const override;
 
 		void print(std::ostream& os) const override;
 
