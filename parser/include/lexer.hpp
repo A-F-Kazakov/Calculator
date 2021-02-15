@@ -33,6 +33,8 @@ namespace calc
 
 		const data_type& tokens() const { return m_tokens; };
 
+		void clear() { m_tokens.clear(); }
+
 	  private:
 		data_type m_tokens;
 
@@ -77,9 +79,9 @@ namespace calc
 	};
 
 	template<template<typename, typename> typename T>
-	 inline std::ostream& operator<<(std::ostream& os, const lexer<T>& lxr)
+	inline std::ostream& operator<<(std::ostream& os, const lexer<T>& lxr)
 	{
-		for(const auto& item : lxr.tokens)
+		for(const auto& item : lxr.tokens())
 			os << item << '\n';
 		return os;
 	}

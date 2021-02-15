@@ -2,6 +2,8 @@
 #define CALCULATOR_NUMBER_EXPRESSION_HPP
 
 #include "expression.hpp"
+#include "token.hpp"
+
 #include <string>
 
 namespace calc::expression
@@ -24,4 +26,4 @@ namespace calc::expression
 	};
 } // namespace calc::expression
 
-#endif //CALCULATOR_NUMBER_EXPRESSION_HPP
+#endif // CALCULATOR_NUMBER_EXPRESSION_HPP

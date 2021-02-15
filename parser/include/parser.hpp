@@ -2,11 +2,11 @@
 #define CALCULATOR_PARSER_HPP
 
 #include "bin_number_expression.hpp"
-#include "hex_number_expression.hpp"
 #include "binary_expression.hpp"
-#include "unary_expression.hpp"
 #include "factorial_expression.hpp"
+#include "hex_number_expression.hpp"
 #include "lexer.hpp"
+#include "unary_expression.hpp"
 
 namespace calc
 {
@@ -14,23 +14,31 @@ namespace calc
 	struct parser
 	{
 		using expression_t = expression::interface;
-		using data_type  = Out<std::unique_ptr<expression_t>, std::allocator<std::unique_ptr<expression_t>>>;
-		using input_type = In<token, std::allocator<token>>;
+		using data_type	 = Out<std::unique_ptr<expression_t>, std::allocator<std::unique_ptr<expression_t>>>;
+		using input_type	 = In<token, std::allocator<token>>;
 
-		explicit parser(const input_type& data) : m_tokens(data) {}
+		parser() = default;
 
-		void parse()
+		void parse(const input_type& tokens)
 		{
-			m_current = m_tokens.cbegin();
-			while(m_current != m_tokens.cend())
+			m_current = tokens.cbegin();
+			m_end		 = tokens.cend();
+
+			while(m_current != tokens.cend())
 				m_result.push_back(expression());
 		}
 
 		const data_type& expressions() const { return m_result; }
 
+		void clear() { m_result.clear(); }
+
+		typename data_type::const_iterator begin() const { return m_result.cbegin(); }
+
+		typename data_type::const_iterator end() const { return m_result.cend(); }
+
 	  private:
-		const input_type& m_tokens;
 		typename input_type::const_iterator m_current;
+		typename input_type::const_iterator m_end;
 		data_type m_result;
 
 		std::unique_ptr<expression_t> expression() { return additive(); }
@@ -115,7 +123,7 @@ namespace calc
 				if(!result)
 					throw std::runtime_error("wrond operator");
 
-				result		= std::make_unique<expression::factorial>(std::move(result));
+				result = std::make_unique<expression::factorial>(std::move(result));
 				get();
 			}
 
@@ -141,7 +149,7 @@ namespace calc
 
 		bool match(token::type_t type)
 		{
-			if(m_current == m_tokens.cend() || m_current->type() != type)
+			if(m_current == m_end || m_current->type() != type)
 				return false;
 			return true;
 		}
