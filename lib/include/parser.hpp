@@ -16,6 +16,7 @@ namespace calc
 		using expression_t = expression::interface;
 		using data_type	 = Out<std::unique_ptr<expression_t>, std::allocator<std::unique_ptr<expression_t>>>;
 		using input_type	 = In<token, std::allocator<token>>;
+		const bool pop_element = true;
 
 		parser() = default;
 
@@ -49,16 +50,14 @@ namespace calc
 
 			while(true)
 			{
-				if(match(token::type_t::plus))
+				if(match(token::plus, pop_element))
 				{
-					get();
 					result = std::make_unique<expression::binary>('+', std::move(result), multiplicative());
 					continue;
 				}
 
-				if(match(token::type_t::minus))
+				if(match(token::minus, pop_element))
 				{
-					get();
 					result = std::make_unique<expression::binary>('-', std::move(result), multiplicative());
 					continue;
 				}
@@ -75,16 +74,14 @@ namespace calc
 			while(true)
 			{
 				// 2 * 6 / 3
-				if(match(token::type_t::multiply))
+				if(match(token::multiply, pop_element))
 				{
-					get();
 					result = std::make_unique<expression::binary>('*', std::move(result), unary());
 					continue;
 				}
 
-				if(match(token::type_t::division))
+				if(match(token::division, pop_element))
 				{
-					get();
 					result = std::make_unique<expression::binary>('/', std::move(result), unary());
 					continue;
 				}
@@ -96,11 +93,8 @@ namespace calc
 
 		std::unique_ptr<expression_t> unary()
 		{
-			if(match(token::type_t::minus))
-			{
-				get();
+			if(match(token::minus, pop_element))
 				return std::make_unique<expression::unary>('-', primary());
-			}
 
 			return primary();
 		}
@@ -118,18 +112,22 @@ namespace calc
 			if(match(token::bin_number))
 				result = std::make_unique<expression::binary_number>(get());
 
-			if(match(token::factorial))
+			if(match(token::factorial, pop_element))
 			{
-				if(!result)
+				if(!result && m_result.empty())
 					throw std::runtime_error("wrond operator");
 
+				if(!result)
+				{
+					result = std::move(m_result.back());
+					m_result.pop_back();
+				}
+
 				result = std::make_unique<expression::factorial>(std::move(result));
-				get();
 			}
 
-			if(match(token::l_bracket))
+			if(match(token::l_bracket, pop_element))
 			{
-				get();
 				result = expression();
 				get(); // close bracket
 			}
@@ -147,10 +145,14 @@ namespace calc
 			return ref;
 		}
 
-		bool match(token::type_t type)
+		bool match(token::type_t type, bool pop = false)
 		{
 			if(m_current == m_end || m_current->type() != type)
 				return false;
+
+			if(pop)
+				get();
+
 			return true;
 		}
 	};

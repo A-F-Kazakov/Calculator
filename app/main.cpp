@@ -5,7 +5,7 @@
 
 using namespace calc;
 
-static std::ostream& operator<<(std::ostream& os, const typename parser<std::vector, std::vector>::data_type& data)
+static std::ostream& operator<<(std::ostream& os, const parser<std::vector, std::vector>::data_type& data)
 {
 	for(const auto& it : data)
 		os << it->eval() << ' ';

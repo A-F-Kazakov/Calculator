@@ -16,7 +16,8 @@ namespace calc
 
 		void tokenize(std::string_view str)
 		{
-			for(auto c = str.cbegin(); c != str.cend(); c++)
+			auto c = str.cbegin();
+			do
 			{
 				if(*c == ' ')
 				{
@@ -27,8 +28,12 @@ namespace calc
 				if(*c >= '0' && *c <= '9')
 					tokenize_number(c, str.cend());
 				else
+				{
 					tokenize_operator(static_cast<size_t>(*c));
+					c++;
+				}
 			}
+			while(c != str.cend());
 		}
 
 		const data_type& tokens() const { return m_tokens; };
@@ -38,23 +43,18 @@ namespace calc
 	  private:
 		data_type m_tokens;
 
-		void tokenize_number(std::string_view::const_iterator begin, std::string_view::const_iterator end)
+		void tokenize_number(std::string_view::const_iterator& begin, std::string_view::const_iterator end)
 		{
 			std::string str;
-			auto t = token::type_t::number;
-
-			bool check_format = false;
-
-			if(*begin == '0')
-				check_format = true;
+			auto t = token::number;
 
 			do
 			{
-				if(check_format && (*begin == 'x' || *begin == 'X') && t != token::type_t::bin_number)
-					t = token::type_t::hex_number;
+				if(t == token::number && (*begin == 'x' || *begin == 'X'))
+					t = token::hex_number;
 
-				if(check_format && (*begin == 'b' || *begin == 'B') && t != token::type_t::hex_number)
-					t = token::type_t::bin_number;
+				if(t == token::number && (*begin == 'b' || *begin == 'B'))
+					t = token::bin_number;
 
 				if(!check(*begin))
 					break;
@@ -74,7 +74,7 @@ namespace calc
 
 		bool check(char c)
 		{
-			return (c >= '0' && c <= '9') || (c == '.' || c == ',') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f');
+			return (c >= '0' && c <= '9') || (c == '.' || c == ',') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f') || (c == 'x' || c == 'X');
 		}
 	};
 

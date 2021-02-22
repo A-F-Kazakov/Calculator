@@ -25,14 +25,14 @@ TEST_CASE("Parser can handle addition", "[parser]")
 
 TEST_CASE("Parser can handle substraction", "[parser]")
 {
-	std::string input_expression = "2-2";
+	std::string input_expression = "22-2";
 
 	lexer.tokenize(input_expression);
 
 	parser.parse(lexer.tokens());
 	const auto& out_expression = parser.expressions();
 
-	REQUIRE(out_expression[0]->eval() == 0.0);
+	REQUIRE(out_expression[0]->eval() == 20.0);
 
 	lexer.clear();
 	parser.clear();
@@ -40,14 +40,14 @@ TEST_CASE("Parser can handle substraction", "[parser]")
 
 TEST_CASE("Parser can handle multiplications", "[parser]")
 {
-	std::string input_expression = "2*2";
+	std::string input_expression = "22*2";
 
 	lexer.tokenize(input_expression);
 
 	parser.parse(lexer.tokens());
 	const auto& out_expression = parser.expressions();
 
-	REQUIRE(out_expression[0]->eval() == 4.0);
+	REQUIRE(out_expression[0]->eval() == 44.0);
 
 	lexer.clear();
 	parser.clear();
@@ -55,14 +55,14 @@ TEST_CASE("Parser can handle multiplications", "[parser]")
 
 TEST_CASE("Parser can handle division", "[parser]")
 {
-	std::string input_expression = "2/2";
+	std::string input_expression = "10/2";
 
 	lexer.tokenize(input_expression);
 
 	parser.parse(lexer.tokens());
 	const auto& out_expression = parser.expressions();
 
-	REQUIRE(out_expression[0]->eval() == 1.0);
+	REQUIRE(out_expression[0]->eval() == 5.0);
 
 	lexer.clear();
 	parser.clear();
@@ -142,3 +142,35 @@ TEST_CASE("Parser can handle complex expressions 4", "[parser]")
 	lexer.clear();
 	parser.clear();
 }
+
+TEST_CASE("Parser can handle complex expressions 5", "[parser]")
+{
+	std::string input_expression = "((3+2)-(1+2))!";
+
+	lexer.tokenize(input_expression);
+
+	parser.parse(lexer.tokens());
+	const auto& out_expression = parser.expressions();
+
+	REQUIRE(out_expression[0]->eval() == 2);
+
+	lexer.clear();
+	parser.clear();
+}
+
+TEST_CASE("Parser can handle multiple expressions", "[parser]")
+{
+	std::string input_expression = "2 + 2*2 (2+2) * 2";
+
+	lexer.tokenize(input_expression);
+
+	parser.parse(lexer.tokens());
+	const auto& out_expression = parser.expressions();
+
+	REQUIRE(out_expression[0]->eval() == 8);
+	REQUIRE(out_expression[1]->eval() == 6);
+
+	lexer.clear();
+	parser.clear();
+}
+
