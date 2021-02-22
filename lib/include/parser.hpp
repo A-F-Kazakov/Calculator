@@ -13,8 +13,8 @@ namespace calc
 	template<template<typename, typename> typename In, template<typename, typename> typename Out>
 	struct parser
 	{
-		using expression_t = expression::interface;
-		using data_type	 = Out<std::unique_ptr<expression_t>, std::allocator<std::unique_ptr<expression_t>>>;
+		using expression_t = std::unique_ptr<expression::interface>;
+		using data_type	 = Out<expression_t, std::allocator<expression_t>>;
 		using input_type	 = In<token, std::allocator<token>>;
 
 		parser() = default;
@@ -40,11 +40,11 @@ namespace calc
 		typename input_type::const_iterator m_current;
 		typename input_type::const_iterator m_end;
 		data_type m_result;
-		static const bool pop_element = true;
+		constexpr static bool pop_element = true;
 
-		std::unique_ptr<expression_t> expression() { return additive(); }
+		expression_t expression() { return additive(); }
 
-		std::unique_ptr<expression_t> additive()
+		expression_t additive()
 		{
 			auto result = multiplicative();
 
@@ -67,9 +67,9 @@ namespace calc
 			return std::move(result);
 		}
 
-		std::unique_ptr<expression_t> multiplicative()
+		expression_t multiplicative()
 		{
-			auto result = unary();
+			auto result = functions();
 
 			while(true)
 			{
@@ -91,52 +91,42 @@ namespace calc
 			return std::move(result);
 		}
 
-		std::unique_ptr<expression_t> unary()
+		expression_t functions()
+		{
+			auto result = unary();
+
+			if(match(token::factorial, pop_element))
+				return std::make_unique<expression::factorial>(std::move(result));
+			return result;
+		}
+
+		expression_t unary()
 		{
 			if(match(token::minus, pop_element))
 				return std::make_unique<expression::unary>('-', primary());
-
 			return primary();
 		}
 
-		std::unique_ptr<expression_t> primary()
+		expression_t primary()
 		{
-			std::unique_ptr<expression_t> result;
-
 			if(match(token::number))
-				result = std::make_unique<expression::number>(get());
+				return std::make_unique<expression::number>(get());
 
 			if(match(token::hex_number))
-				result = std::make_unique<expression::hex_number>(get());
+				return std::make_unique<expression::hex_number>(get());
 
 			if(match(token::bin_number))
-				result = std::make_unique<expression::binary_number>(get());
+				return std::make_unique<expression::binary_number>(get());
 
-			if(match(token::factorial, pop_element))
-			{
-				if(!result && m_result.empty())
-					throw std::runtime_error("wrond operator");
-
-				if(!result)
-				{
-					result = std::move(m_result.back());
-					m_result.pop_back();
-				}
-
-				result = std::make_unique<expression::factorial>(std::move(result));
-			}
-
-			if(!result && match(token::l_bracket))
+			if(match(token::l_bracket))
 			{
 				get();
-				result = expression();
-				get(); // close bracket
+				auto result = expression();
+				get();
+				return result;
 			}
 
-			if(!result)
-				throw std::runtime_error("unsupported expression");
-
-			return std::move(result);
+			throw std::runtime_error("unsupported expression");
 		}
 
 		const token& get()
@@ -146,7 +136,7 @@ namespace calc
 			return ref;
 		}
 
-		bool match(token::type_t type, bool pop = false)
+		bool match(const token::type_t type, const bool pop = false)
 		{
 			if(m_current == m_end || m_current->type() != type)
 				return false;

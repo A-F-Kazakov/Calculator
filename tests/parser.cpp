@@ -137,7 +137,7 @@ TEST_CASE("Parser can handle complex expressions 4", "[parser]")
 	parser.parse(lexer.tokens());
 	const auto& out_expression = parser.expressions();
 
-	REQUIRE(out_expression[0]->eval() == 1 / 4);
+	REQUIRE(out_expression[0]->eval() == 0.25);
 
 	lexer.clear();
 	parser.clear();
@@ -160,17 +160,16 @@ TEST_CASE("Parser can handle complex expressions 5", "[parser]")
 
 TEST_CASE("Parser can handle multiple expressions", "[parser]")
 {
-	std::string input_expression = "2 + 2*2 (2+2) * 2";
+	std::string input_expression = "2+2*2 (2+2)*2";
 
 	lexer.tokenize(input_expression);
 
 	parser.parse(lexer.tokens());
 	const auto& out_expression = parser.expressions();
 
-	REQUIRE(out_expression[0]->eval() == 8);
-	REQUIRE(out_expression[1]->eval() == 6);
+	REQUIRE(out_expression[0]->eval() == 6);
+	REQUIRE(out_expression[1]->eval() == 8);
 
 	lexer.clear();
 	parser.clear();
 }
-

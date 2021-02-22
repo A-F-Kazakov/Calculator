@@ -34,9 +34,9 @@ int main(int argc, const char** argv)
 	lexer<std::vector> l;
 	parser<std::vector, std::vector> p;
 
-	//for(int i = 1; i < argc; ++i)
+	for(int i = 1; i < argc; ++i)
 	{
-		l.tokenize("2+3*4 (2+3)*4");
+		l.tokenize(argv[i]);
 
 		p.parse(l.tokens());
 
