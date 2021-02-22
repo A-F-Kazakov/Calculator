@@ -16,7 +16,6 @@ namespace calc
 		using expression_t = expression::interface;
 		using data_type	 = Out<std::unique_ptr<expression_t>, std::allocator<std::unique_ptr<expression_t>>>;
 		using input_type	 = In<token, std::allocator<token>>;
-		const bool pop_element = true;
 
 		parser() = default;
 
@@ -41,6 +40,7 @@ namespace calc
 		typename input_type::const_iterator m_current;
 		typename input_type::const_iterator m_end;
 		data_type m_result;
+		static const bool pop_element = true;
 
 		std::unique_ptr<expression_t> expression() { return additive(); }
 
@@ -126,8 +126,9 @@ namespace calc
 				result = std::make_unique<expression::factorial>(std::move(result));
 			}
 
-			if(match(token::l_bracket, pop_element))
+			if(!result && match(token::l_bracket))
 			{
+				get();
 				result = expression();
 				get(); // close bracket
 			}
@@ -160,8 +161,14 @@ namespace calc
 	template<template<typename, typename> typename In, template<typename, typename> typename Out>
 	inline std::ostream& operator<<(std::ostream& os, const parser<In, Out>& parser)
 	{
-		for(const auto& it : parser.expressions())
-			it->print(os);
+		auto it = parser.begin(); 
+		while(it != parser.end())
+		{
+			(*it)->print(os);
+			it++;
+			if(it != parser.end())
+				os << ", ";
+		}
 
 		return os;
 	}

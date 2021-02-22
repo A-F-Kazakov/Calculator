@@ -7,8 +7,14 @@ using namespace calc;
 
 static std::ostream& operator<<(std::ostream& os, const parser<std::vector, std::vector>::data_type& data)
 {
-	for(const auto& it : data)
-		os << it->eval() << ' ';
+	auto it = data.begin();
+	while(it != data.end())
+	{
+		os << (*it)->eval();
+		it++;
+		if(it != data.end())
+			os << ", ";
+	}
 	return os;
 }
 
@@ -28,14 +34,14 @@ int main(int argc, const char** argv)
 	lexer<std::vector> l;
 	parser<std::vector, std::vector> p;
 
-	for(int i = 1; i < argc; ++i)
+	//for(int i = 1; i < argc; ++i)
 	{
-		l.tokenize(argv[i]);
+		l.tokenize("2+3*4 (2+3)*4");
 
 		p.parse(l.tokens());
 
 		auto& parsed = p.expressions();
-		std::cout << i << ". " << p << " = " << parsed << std::endl;
+		std::cout << 0 << ". " << p << " = " << parsed << std::endl;
 		l.clear();
 		p.clear();
 	}
