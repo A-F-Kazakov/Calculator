@@ -1,0 +1,43 @@
+name: Action
+
+on: push
+
+jobs:
+   build:
+      name: ${{ matrix.cfg.name }}
+      runs-on: ${{ matrix.cfg.os }}
+      strategy:
+         fail-fast: true
+         matrix:
+            cfg:
+            -
+               name: MacOS
+               os: macos-latest
+               flags: -- -j2
+            -
+               name: Windows
+               os: windows-latest
+               flags: ''
+            -
+               name: Linux
+               os: ubuntu-latest
+               flags: -- -j2
+
+      steps:
+         - uses: actions/checkout@v2
+         - 
+            name: Configure
+            run: cmake -S . -B build -D CMAKE_BUILD_TYPE=Release
+         -
+           name: Tests
+           continue-on-error: true
+           run: cmake --build build --config Release --target Calculator-tests ${{ matrix.cfg.flags }}
+         -
+            name: Build
+            run: cmake --build build --config Release --target Calculator ${{ matrix.cfg.bflags }}
+         -
+            name: Upload
+            uses: actions/upload-artifact@main
+            with:
+               name: ${{ matrix.cfg.name }}
+               path: build/app/Calculator*
