@@ -1,0 +1,36 @@
+name: Manual
+
+on:
+  workflow_dispatch:
+    inputs:
+      os:
+        description: Build OS
+        required: true
+        default: ubuntu-latest
+      revision:
+        required: false
+        default: ''
+
+jobs:
+   build:
+      runs-on: ${{ github.event.inputs.os }}
+      steps:
+         - uses: actions/checkout@v2
+           with:
+             ref: ${{ github.event.inputs.revision }}
+         - 
+            name: Configure
+            run: cmake -S . -B build -D CMAKE_BUILD_TYPE=Release
+         -
+           name: Tests
+           continue-on-error: true
+           run: cmake --build build --config Release --target Calculator-tests ${{ matrix.cfg.flags }}
+         -
+            name: Build
+            run: cmake --build build --config Release --target Calculator ${{ matrix.cfg.bflags }}
+         -
+            name: Upload
+            uses: actions/upload-artifact@main
+            with:
+               name: ${{ github.event.inputs.os }}
+               path: build/app/Calculator*
