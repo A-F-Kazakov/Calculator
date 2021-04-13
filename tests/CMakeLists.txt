@@ -1,5 +1,7 @@
 message(STATUS "Build ${PROJECT_NAME} tests enabled")
 
+find_package(Catch2 REQUIRED)
+
 set(TARGET_NAME_HEAD ${PROJECT_NAME}-test)
 
 enable_testing()

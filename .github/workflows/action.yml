@@ -24,20 +24,37 @@ jobs:
                flags: -- -j2
 
       steps:
-         - uses: actions/checkout@v2
-         - 
-            name: Configure
-            run: cmake -S . -B build -D CMAKE_BUILD_TYPE=Release
-         -
-           name: Tests
-           continue-on-error: true
-           run: cmake --build build --config Release --target Calculator-tests ${{ matrix.cfg.flags }}
-         -
-            name: Build
-            run: cmake --build build --config Release --target Calculator ${{ matrix.cfg.bflags }}
-         -
-            name: Upload
-            uses: actions/upload-artifact@main
-            with:
-               name: ${{ matrix.cfg.name }}
-               path: build/app/Calculator*
+        - uses: actions/checkout@v2
+        -
+          name: Cache Primes
+          id: catch2
+          uses: actions/cache@v2
+          with:
+            path: deps
+            key: ${{ runner.os }}-c6
+        -
+          name: Setup Catch2
+          if: steps.catch2.outputs.cache-hit != 'true'
+          run: |
+            git clone https://github.com/catchorg/Catch2.git
+            pushd Catch2 && git checkout tags/v2.13.5 && popd
+            cmake -S Catch2 -B catch_build -DCATCH_BUILD_TESTING=OFF -DCATCH_INSTALL_DOCS=OFF -DCATCH_INSTALL_EXTRAS=OFF -DCMAKE_INSTALL_PREFIX=deps
+            cmake --build catch_build --config Release ${{ matrix.cfg.flags }}
+            cmake --install catch_build
+        -
+          name: Configure
+          env:
+            CMAKE_PREFIX_PATH: deps
+          run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
+        -
+          name: Tests
+          run: cmake --build build --config Release --target Calculator-tests ${{ matrix.cfg.flags }}
+        -
+          name: Build
+          run: cmake --build build --config Release --target Calculator ${{ matrix.cfg.flags }}
+        -
+          name: Upload
+          uses: actions/upload-artifact@main
+          with:
+             name: ${{ matrix.cfg.name }}
+             path: build/app/Calculator*

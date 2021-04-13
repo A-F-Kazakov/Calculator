@@ -2,11 +2,11 @@ cmake_minimum_required(VERSION 3.13)
 
 project(Calculator)
 
+option(BUILD_TESTS "Build ${PROJECT_NAME} tests" OFF)
+
 add_subdirectory(lib)
 add_subdirectory(app)
 
-find_package(Catch2 QUIET)
-
-if(Catch2_FOUND)
+if(${BUILD_TESTS})
 	add_subdirectory(tests)
 endif()
