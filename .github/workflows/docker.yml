@@ -1,6 +1,10 @@
 name: Docker
 
-on: push
+on:
+  workflow_run:
+    workflows: ["Action"]
+    types:
+      - completed
 
 jobs:
   build:
