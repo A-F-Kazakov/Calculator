@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.13)
 
-project(Calculator)
+project(Calculator VERSION 0.0.17)
 
 option(BUILD_TESTS "Build ${PROJECT_NAME} tests" OFF)
 
