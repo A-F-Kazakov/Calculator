@@ -1,6 +1,6 @@
+#include <iostream>
 #include <lexer.hpp>
 #include <parser.hpp>
-#include <iostream>
 #include <vector>
 
 using namespace calc;
@@ -20,7 +20,7 @@ static std::ostream& operator<<(std::ostream& os, const parser<std::vector, std:
 
 static inline int usage(std::string_view name)
 {
-	auto pos = name.find_first_of("\\");
+	auto pos	  = name.find_first_of("\\");
 	auto name1 = name.substr(pos);
 	std::cout << "usage:\n" << name1 << " [expression] [expression]\n";
 	return 0;
