@@ -5,163 +5,124 @@
 #include "binary_expression.hpp"
 #include "factorial_expression.hpp"
 #include "hex_number_expression.hpp"
-#include "lexer.hpp"
 #include "unary_expression.hpp"
 
 namespace calc
 {
-	template<template<typename, typename> typename In, template<typename, typename> typename Out>
-	struct parser
+	namespace
 	{
 		using expression_t = std::unique_ptr<expression::interface>;
-		using data_type	 = Out<expression_t, std::allocator<expression_t>>;
-		using input_type	 = In<token, std::allocator<token>>;
 
-		parser() = default;
-
-		void parse(const input_type& tokens)
+		template<typename Iterator>
+		expression_t primary(Iterator& begin, Iterator end)
 		{
-			m_current = tokens.cbegin();
-			m_end		 = tokens.cend();
-
-			while(m_current != tokens.cend())
-				m_result.push_back(expression());
-		}
-
-		const data_type& expressions() const { return m_result; }
-
-		void clear() { m_result.clear(); }
-
-		typename data_type::const_iterator begin() const { return m_result.cbegin(); }
-
-		typename data_type::const_iterator end() const { return m_result.cend(); }
-
-	  private:
-		typename input_type::const_iterator m_current;
-		typename input_type::const_iterator m_end;
-		data_type m_result;
-		constexpr static bool pop_element = true;
-
-		expression_t expression() { return additive(); }
-
-		expression_t additive()
-		{
-			auto result = multiplicative();
-
-			while(true)
+			switch(begin->type())
 			{
-				if(match(token::plus, pop_element))
+				case token::number:
+					return std::make_unique<expression::number>(*begin++);
+				case token::hex_number:
+					return std::make_unique<expression::hex_number>(*begin++);
+				case token::bin_number:
+					return std::make_unique<expression::binary_number>(*begin++);
+				case token::l_bracket:
 				{
-					result = std::make_unique<expression::binary>('+', std::move(result), multiplicative());
-					continue;
-				}
+					++begin;
+					auto result = additive(begin, end);
 
-				if(match(token::minus, pop_element))
-				{
-					result = std::make_unique<expression::binary>('-', std::move(result), multiplicative());
-					continue;
+					if(begin != end && begin->type() == token::r_bracket)
+						++begin;
+					return result;
 				}
-				break;
+				default:
+					throw std::runtime_error("unsupported expression");
 			}
-
-			return std::move(result);
 		}
 
-		expression_t multiplicative()
+		template<typename Iterator>
+		expression_t unary(Iterator& begin, Iterator end)
 		{
-			auto result = functions();
+			if(begin->type() == token::minus)
+				return std::make_unique<expression::unary>('-', primary(++begin, end));
+			return primary(begin, end);
+		}
 
-			while(true)
+		template<typename Iterator>
+		expression_t functions(Iterator& begin, Iterator end)
+		{
+			auto result = unary(begin, end);
+
+			if(begin != end && begin->type() == token::factorial)
 			{
-				// 2 * 6 / 3
-				if(match(token::multiply, pop_element))
-				{
-					result = std::make_unique<expression::binary>('*', std::move(result), unary());
-					continue;
-				}
-
-				if(match(token::division, pop_element))
-				{
-					result = std::make_unique<expression::binary>('/', std::move(result), unary());
-					continue;
-				}
-				break;
-			}
-
-			return std::move(result);
-		}
-
-		expression_t functions()
-		{
-			auto result = unary();
-
-			if(match(token::factorial, pop_element))
+				++begin;
 				return std::make_unique<expression::factorial>(std::move(result));
+			}
 			return result;
 		}
 
-		expression_t unary()
+		template<typename Iterator>
+		expression_t multiplicative(Iterator& begin, Iterator end)
 		{
-			if(match(token::minus, pop_element))
-				return std::make_unique<expression::unary>('-', primary());
-			return primary();
-		}
+			auto result = functions(begin, end);
 
-		expression_t primary()
-		{
-			if(match(token::number))
-				return std::make_unique<expression::number>(get());
-
-			if(match(token::hex_number))
-				return std::make_unique<expression::hex_number>(get());
-
-			if(match(token::bin_number))
-				return std::make_unique<expression::binary_number>(get());
-
-			if(match(token::l_bracket))
+			while(begin != end)
 			{
-				get();
-				auto result = expression();
-				get();
-				return result;
+				// 2 * 6 / 3
+				if(begin->type() == token::multiply)
+				{
+					result = std::make_unique<expression::binary>('*', std::move(result), unary(++begin, end));
+					continue;
+				}
+
+				if(begin->type() == token::division)
+				{
+					result = std::make_unique<expression::binary>('/', std::move(result), unary(++begin, end));
+					continue;
+				}
+				break;
 			}
 
-			throw std::runtime_error("unsupported expression");
+			return std::move(result);
 		}
 
-		const token& get()
+		template<typename Iterator>
+		expression_t additive(Iterator& begin, Iterator end)
 		{
-			auto& ref = *m_current;
-			m_current++;
-			return ref;
+			auto result = multiplicative(begin, end);
+
+			while(begin != end)
+			{
+				if(begin->type() == token::plus)
+				{
+					result = std::make_unique<expression::binary>('+', std::move(result),
+						multiplicative(++begin, end));
+					continue;
+				}
+
+				if(begin->type() == token::minus)
+				{
+					result = std::make_unique<expression::binary>('-', std::move(result),
+						multiplicative(++begin, end));
+					continue;
+				}
+				break;
+			}
+
+			return std::move(result);
 		}
-
-		bool match(const token::type_t type, const bool pop = false)
-		{
-			if(m_current == m_end || m_current->type() != type)
-				return false;
-
-			if(pop)
-				get();
-
-			return true;
-		}
-	};
-
-	template<template<typename, typename> typename In, template<typename, typename> typename Out>
-	inline std::ostream& operator<<(std::ostream& os, const parser<In, Out>& parser)
-	{
-		auto it = parser.begin(); 
-		while(it != parser.end())
-		{
-			(*it)->print(os);
-			it++;
-			if(it != parser.end())
-				os << ", ";
-		}
-
-		return os;
 	}
 
+	template<template<typename T> typename Container, typename Tokens>
+	Container<expression_t> parse(const Tokens& tokens)
+	{
+		Container<expression_t> expressions;
+
+		auto begin = tokens.begin();
+		auto end = tokens.end();
+
+		while(begin != end)
+			expressions.push_back(additive(begin, end));
+
+		return expressions;
+	}
 } // namespace calc
 #endif // CALCULATOR_PARSER_HPP

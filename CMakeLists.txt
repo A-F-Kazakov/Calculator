@@ -8,5 +8,6 @@ add_subdirectory(lib)
 add_subdirectory(app)
 
 if(${BUILD_TESTS})
+	enable_testing()
 	add_subdirectory(tests)
 endif()

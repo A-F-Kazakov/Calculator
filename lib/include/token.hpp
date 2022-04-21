@@ -8,19 +8,19 @@ namespace calc
 {
 	struct token
 	{
-		enum type_t : size_t
+		enum type_t
 		{
 			none,
 			number,
 			hex_number,
 			bin_number,
-			plus		 = '+',
-			minus		 = '-',
-			multiply	 = '*',
-			division	 = '/',
-			l_bracket = '(',
-			r_bracket = ')',
-			factorial = '!'
+			plus,
+			minus,
+			multiply,
+			division,
+			l_bracket,
+			r_bracket,
+			factorial
 		};
 
 		token() = default;

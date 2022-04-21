@@ -7,8 +7,12 @@ namespace calc::expression
 {
 	struct binary : interface
 	{
-		binary(char operation, std::unique_ptr<interface>&& expr1, std::unique_ptr<interface>&& expr2) :
+		binary(size_t operation, std::unique_ptr<interface>&& expr1, std::unique_ptr<interface>&& expr2) :
 			m_expr1(std::move(expr1)), m_expr2(std::move(expr2)), m_operation(operation) {}
+
+		binary(const binary&) = delete;
+
+		binary& operator=(const binary&) = delete;
 
 		double eval() const override
 		{
@@ -33,12 +37,13 @@ namespace calc::expression
 
 		void print(std::ostream& os) const override
 		{
-		   os << '(' << *m_expr1 << " " << m_operation << " " << *m_expr2 << ')';
+		   os << '(' << *m_expr1 << " " << static_cast<char>(m_operation) << " " << *m_expr2 << ')';
 		}
 
 	  private:
-		std::unique_ptr<interface> m_expr1, m_expr2;
-		char m_operation;
+		std::unique_ptr<interface> m_expr1;
+		std::unique_ptr<interface> m_expr2;
+		size_t m_operation;
 	};
 } // namespace calc::expression
 

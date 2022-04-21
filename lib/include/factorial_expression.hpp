@@ -10,6 +10,10 @@ namespace calc::expression
 	{
 		factorial(std::unique_ptr<interface>&& ptr) : m_expr(std::move(ptr)) {}
 
+		factorial(const factorial&) = delete;
+
+		factorial& operator=(const factorial&) = delete;
+
 		double eval() const override { return algorithm::factorial(m_expr->eval()); }
 
 		void print(std::ostream& os) const override
