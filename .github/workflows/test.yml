@@ -1,0 +1,46 @@
+name: Test
+
+on: push
+
+jobs:
+   test:
+      runs-on: ${{ matrix.os }}
+      strategy:
+         fail-fast: false
+         matrix:
+          os: [macos-latest, windows-latest, ubuntu-latest]
+
+      steps:
+        - uses: actions/checkout@v2
+        -
+          name: Cache
+          id: catch2
+          uses: actions/cache@v2
+          with:
+            path: deps
+            key: ${{ runner.os }}-catch
+        -
+          name: Setup Catch2
+          if: steps.catch2.outputs.cache-hit != 'true'
+          run: |
+            git clone https://github.com/catchorg/Catch2.git
+            pushd Catch2 && git checkout tags/v2.13.5 && popd
+            cmake -S Catch2 -B catch_build -DCATCH_BUILD_TESTING=OFF -DCATCH_INSTALL_DOCS=OFF -DCATCH_INSTALL_EXTRAS=OFF -DCMAKE_INSTALL_PREFIX=deps
+            cmake --build catch_build --config Release -j2
+            cmake --install catch_build
+        -
+          name: Configure
+          run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DCMAKE_PREFIX_PATH=deps
+        -
+          name: Build
+          run: cmake --build build --config Debug --target Calculator -j2
+        -
+          name: Test
+          working-directory: build
+          run: ctest -C Debug -j2
+        -
+          name: Upload
+          uses: actions/upload-artifact@main
+          with:
+             name: ${{ matrix.os }}-debug
+             path: build/app/Calculator*

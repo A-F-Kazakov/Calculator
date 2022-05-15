@@ -14,6 +14,9 @@ namespace calc
 		using expression_t = std::unique_ptr<expression::interface>;
 
 		template<typename Iterator>
+		expression_t additive(Iterator&, Iterator);
+
+		template<typename Iterator>
 		expression_t primary(Iterator& begin, Iterator end)
 		{
 			switch(begin->type())

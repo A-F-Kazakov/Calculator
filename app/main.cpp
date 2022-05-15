@@ -1,8 +1,10 @@
-#include <iostream>
+﻿#include <iostream>
 #include <vector>
 
 #include <lexer.hpp>
 #include <parser.hpp>
+
+using std::cout;
 
 static inline int usage(std::string_view name)
 {
@@ -24,9 +26,9 @@ int main(int argc, const char** argv)
 
 		for(const auto& it : expressions)
 		{
-			std::cout << ++counter << ". ";
+			cout << ++counter << ". ";
 			it->print(std::cout);
-			std::cout << " = " << it->eval() << std::endl;
+			cout << " = " << it->eval() << '\n';
 		}
 	}
 }

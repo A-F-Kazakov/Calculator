@@ -14,13 +14,13 @@ namespace calc
 			number,
 			hex_number,
 			bin_number,
-			plus,
-			minus,
-			multiply,
-			division,
-			l_bracket,
-			r_bracket,
-			factorial
+			plus = '+',
+			minus = '-',
+			multiply = '*',
+			division = '/',
+			l_bracket = '(',
+			r_bracket = ')',
+			factorial = '!'
 		};
 
 		token() = default;
