@@ -84,7 +84,7 @@ namespace calc
 				break;
 			}
 
-			return std::move(result);
+			return result;
 		}
 
 		template<typename Iterator>
@@ -110,7 +110,7 @@ namespace calc
 				break;
 			}
 
-			return std::move(result);
+			return result;
 		}
 	}
 

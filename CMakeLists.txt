@@ -1,7 +1,6 @@
-cmake_minimum_required(VERSION 3.13)
-set(CMAKE_SYSTEM_PROCESSOR ARM)
+cmake_minimum_required(VERSION 3.16)
 
-project(Calculator VERSION 0.0.19)
+project(Calculator VERSION 0.0.20)
 
 option(BUILD_TESTS "Build ${PROJECT_NAME} tests" OFF)
 
