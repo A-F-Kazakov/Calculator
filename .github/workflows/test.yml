@@ -2,6 +2,9 @@ name: Test
 
 on: push
 
+env:
+  CMAKE_PREFIX_PATH: deps
+
 jobs:
    test:
       runs-on: ${{ matrix.os }}
@@ -25,15 +28,15 @@ jobs:
           run: |
             git clone https://github.com/catchorg/Catch2.git
             pushd Catch2 && git checkout tags/v2.13.5 && popd
-            cmake -S Catch2 -B catch_build -DCATCH_BUILD_TESTING=OFF -DCATCH_INSTALL_DOCS=OFF -DCATCH_INSTALL_EXTRAS=OFF -DCMAKE_INSTALL_PREFIX=deps
+            cmake -S Catch2 -B catch_build -DCATCH_BUILD_TESTING=OFF -DCATCH_INSTALL_DOCS=OFF -DCATCH_INSTALL_EXTRAS=OFF -DCMAKE_INSTALL_PREFIX=${{ env.CMAKE_PREFIX_PATH }}
             cmake --build catch_build --config Release -j2
             cmake --install catch_build
         -
           name: Configure
-          run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DCMAKE_PREFIX_PATH=deps
+          run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON
         -
           name: Build
-          run: cmake --build build --config Debug --target Calculator -j2
+          run: cmake --build build --config Debug -j2
         -
           name: Test
           working-directory: build

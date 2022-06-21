@@ -1,12 +1,11 @@
 message(STATUS "Build ${PROJECT_NAME} tests enabled")
 
-find_package(Catch2 REQUIRED)
+find_package(Catch2 CONFIG REQUIRED)
 
 set(TARGET_NAME_HEAD ${PROJECT_NAME}-test)
 
 add_compile_options(-O0 -g --coverage)
 link_libraries(Catch2::Catch2 Parser --coverage)
-
 
 #
 

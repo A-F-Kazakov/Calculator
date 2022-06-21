@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(Calculator VERSION 0.0.20)
+project(Calculator VERSION 0.0.20 LANGUAGES CXX)
 
-option(BUILD_TESTS "Build ${PROJECT_NAME} tests" OFF)
+option(BUILD_TESTS "Build ${PROJECT_NAME} tests")
 
 add_subdirectory(lib)
 add_subdirectory(app)

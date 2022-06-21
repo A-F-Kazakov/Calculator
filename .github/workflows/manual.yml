@@ -24,10 +24,10 @@ jobs:
          -
            name: Tests
            continue-on-error: true
-           run: cmake --build build --config Release --target Calculator-tests ${{ matrix.cfg.flags }}
+           run: cmake --build build --config Release --target Calculator-tests
          -
             name: Build
-            run: cmake --build build --config Release --target Calculator ${{ matrix.cfg.bflags }}
+            run: cmake --build build --config Release --target Calculator
          -
             name: Upload
             uses: actions/upload-artifact@main

@@ -42,10 +42,13 @@ namespace calc
 		}
 	} // namespace
 
-	template<template<typename T> typename Container>
-	Container<token> tokenize(std::string_view str)
+	template<
+		template<typename, typename> typename Container,
+		template<typename> typename Allocator = std::allocator
+		>
+	auto tokenize(std::string_view str)
 	{
-		Container<token> tokens;
+		Container<token, Allocator<token>> tokens;
 		auto c = str.begin();
 		do
 		{

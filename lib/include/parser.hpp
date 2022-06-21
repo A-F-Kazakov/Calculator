@@ -114,10 +114,14 @@ namespace calc
 		}
 	}
 
-	template<template<typename T> typename Container, typename Tokens>
-	Container<expression_t> parse(const Tokens& tokens)
+	template<
+		template<typename, typename> typename Container,
+		typename Tokens,
+		template<typename> typename Allocator = std::allocator
+		>
+	auto parse(const Tokens& tokens)
 	{
-		Container<expression_t> expressions;
+		Container<expression_t, Allocator<expression_t>> expressions;
 
 		auto begin = tokens.begin();
 		auto end = tokens.end();
