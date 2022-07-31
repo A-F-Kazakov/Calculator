@@ -5,13 +5,14 @@ find_package(Catch2 CONFIG REQUIRED)
 set(TARGET_NAME_HEAD ${PROJECT_NAME}-test)
 
 add_compile_options(-O0 -g --coverage)
-link_libraries(Catch2::Catch2 Parser --coverage)
+link_libraries(Catch2::Catch2WithMain Parser --coverage)
 
 #
 
 set(TARGET_NAME ${TARGET_NAME_HEAD}-lexer)
 
 add_executable(${TARGET_NAME} lexer.cpp)
+target_link_libraries(${TARGET_NAME} INTERFACE san)
 add_test(NAME ${TARGET_NAME} COMMAND ${TARGET_NAME} -o ${TARGET_NAME}.xml -r junit)
 
 #

@@ -1,5 +1,6 @@
-#define CATCH_CONFIG_MAIN
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/benchmark/catch_benchmark_all.hpp>
+
 #include <lexer.hpp>
 #include <vector>
 #include <list>
@@ -20,6 +21,8 @@ TEST_CASE("Lexer can handle addition", "[lexer]")
 	REQUIRE(tokens[1].type() == token::plus);
 	REQUIRE(tokens[2].type() == token::number);
 	REQUIRE(tokens[2].data() == "2");
+
+	BENCHMARK("parse") { return calc::tokenize<vector>(input_expression); };
 }
 
 TEST_CASE("Lexer can handle substraction", "[lexer]")
