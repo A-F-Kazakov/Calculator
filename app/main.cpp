@@ -17,18 +17,25 @@ int main(int argc, const char** argv)
 	if(argc < 2)
 		return usage(argv[0]);
 
-	size_t counter{};
-	for(int i{1}; i < argc; ++i)
+	try
 	{
-		auto tokens = calc::tokenize<std::vector>(argv[i]);
-
-		auto expressions = calc::parse<std::vector>(tokens);
-
-		for(const auto& it : expressions)
+		size_t counter{};
+		for(int i{1}; i < argc; ++i)
 		{
-			cout << ++counter << ". ";
-			it->print(std::cout);
-			cout << " = " << it->eval() << '\n';
+			auto tokens = calc::tokenize<std::vector>(argv[i]);
+
+			auto expressions = calc::parse<std::vector>(tokens);
+
+			for(const auto& it : expressions)
+			{
+				cout << ++counter << ". ";
+				it->print(std::cout);
+				cout << " = " << it->eval() << '\n';
+			}
 		}
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << std::endl;
 	}
 }

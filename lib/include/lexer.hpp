@@ -35,7 +35,7 @@ namespace calc
 				else
 					str.push_back(*begin);
 
-				begin++;
+				++begin;
 			} while(begin != end);
 
 			tokens.emplace_back(t, std::move(str));

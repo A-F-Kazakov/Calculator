@@ -19,6 +19,8 @@ namespace calc
 		template<typename Iterator>
 		expression_t primary(Iterator& begin, Iterator end)
 		{
+			using namespace std::literals;
+
 			switch(begin->type())
 			{
 				case token::number:
@@ -37,7 +39,7 @@ namespace calc
 					return result;
 				}
 				default:
-					throw std::runtime_error("unsupported expression");
+					throw std::runtime_error("unsupported primary expression ("s + (char)begin->type() + ")");
 			}
 		}
 

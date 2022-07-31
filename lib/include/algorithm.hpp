@@ -6,7 +6,7 @@ namespace calc::algorithm
 	template<typename T>
 	T factorial(T n)
 	{
-		T factorial = 1;
+		T factorial{1};
 
 		for(T i = 2; i <= n; ++i)
 			factorial *= i;
@@ -17,8 +17,7 @@ namespace calc::algorithm
 	template<typename T>
 	T combination(T k, T n)
 	{
-		T res = factorial(n) / factorial(k) * factorial(n - k);
-		return res;
+		return factorial(n) / factorial(k) * factorial(n - k);
 	}
 } // namespace calc
 
