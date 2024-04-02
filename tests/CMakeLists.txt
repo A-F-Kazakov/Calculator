@@ -22,3 +22,11 @@ set(TARGET_NAME ${TARGET_NAME_HEAD}-parser)
 add_executable(${TARGET_NAME} parser.cpp)
 add_test(NAME ${TARGET_NAME} COMMAND ${TARGET_NAME} -o ${TARGET_NAME}.xml -r junit)
 
+
+include(ExternalData)
+
+set(ExternalData_URL_TEMPLATES "file://$ENV{HOME}/%(algo)/%(hash)")
+
+#ExternalData_Add_Test(${PROJECT_NAME}_d NAME ${PROJECT_NAME}_test COMMAND ${PROJECT_NAME} DATA{toremove})
+#ExternalData_Add_Target(${PROJECT_NAME}_d)
+

@@ -10,6 +10,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include(sanitizers OPTIONAL)
 
+set(CMAKE_EXE_LINKER_FLAGS "-static")
+
 add_subdirectory(lib)
 add_subdirectory(app)
 
